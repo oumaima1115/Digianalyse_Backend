@@ -1,0 +1,27 @@
+version: '3'
+services:
+  digianalyse_backend:
+    image: digianalyse_backend_image:latest
+    build: .
+    restart: "no"
+    container_name: digianalyse_backend
+    ports:
+      - "9008:8000"
+    volumes:
+      - .:/code
+    mem_limit: 13g
+    entrypoint: ["sh", "-c", "python manage.py runserver 0.0.0.0:8000"]
+    # entrypoint: ["gunicorn", "senti_base.wsgi:application", "--bind", "0.0.0.0:8000"]
+    environment:
+          - URL_ELASTIC="http://elasticsearch:9200"
+          
+  elasticsearch:
+      image: bitnami/elasticsearch:latest
+      container_name: elasticsearch
+      environment:
+      - discovery.type=single-node
+      ports:
+      - "9200:9200"
+      - "9300:9300"
+      volumes:
+      - .:/code

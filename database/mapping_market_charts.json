@@ -1,0 +1,246 @@
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "user_id": {
+        "type": "keyword"
+      },
+      "mention": {
+        "type": "text"
+      },
+      "months_chart": {
+        "properties": {
+          "colors": {
+            "type": "keyword"
+          },
+          "months": {
+            "type": "keyword"
+          },
+          "sources": {
+            "type": "keyword"
+          },
+          "sources_total_mentions": {
+            "type": "text"
+          },
+          "sources_total_unique_authors": {
+            "type": "text"
+          },
+          "total_mentions": {
+            "type": "integer"
+          },
+          "total_mentions_percentages": {
+            "type": "keyword"
+          },
+          "total_unique_authors": {
+            "type": "integer"
+          },
+          "total_unique_authors_percentages": {
+            "type": "keyword"
+          }
+        }
+      },
+      "topics_chart": {
+        "properties": {
+          "topics": {
+            "type": "keyword"
+          },
+          "colors": {
+            "type": "keyword"
+          },
+          "counts": {
+            "type": "integer"
+          },
+          "date_topics": {
+            "type": "date"
+          },
+          "percentages": {
+            "type": "text"
+          },
+          "topic_texts_raw": {
+            "type": "nested",
+            "properties": {
+              "text": {
+                "type": "integer"
+              },
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "wordcloud_chart": {
+            "type": "nested",
+            "properties": {
+              "padding": {
+                "type": "integer"
+              },
+              "minSize": {
+                "type": "integer"
+              },
+              "scale": {
+                "type": "integer"
+              },
+              "words": {
+                "type": "nested",
+                "properties": {
+                  "text": {
+                    "type": "keyword"
+                  },
+                  "value": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "fontFamily": {
+                "type": "keyword"
+              },
+              "colors": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      },
+      "last_hour_chart": {
+        "properties": {
+          "colors": {
+            "type": "keyword"
+          },
+          "dates": {
+            "type": "date"
+          },
+          "sources": {
+            "type": "keyword"
+          },
+          "sources_total_hashtags": {
+            "type": "integer"
+          },
+          "sources_total_mentions": {
+            "type": "integer"
+          },
+          "sources_total_texts_hashtags": {
+            "type": "integer"
+          },
+          "sources_total_texts_mentions": {
+            "type": "integer"
+          },
+          "texts_dates": {
+            "type": "date"
+          }
+        }
+      },
+      "sentiment_chart": {
+        "properties": {
+          "dates": {
+            "type": "date"
+          },
+          "colors": {
+            "type": "keyword"
+          },
+          "negative": {
+            "type": "integer"
+          },
+          "negative_sources": {
+            "type": "text"
+          },
+          "neutral": {
+            "type": "integer"
+          },
+          "neutral_sources": {
+            "type": "text"
+          },
+          "positive": {
+            "type": "integer"
+          },
+          "positive_sources": {
+            "type": "text"
+          },
+          "sentiment_texts": {
+            "type": "nested",
+            "properties": {
+              "sentiment": {
+                "type": "keyword"
+              },
+              "source": {
+                "type": "keyword"
+              },
+              "texts": {
+                "type": "keyword"
+              }
+            }
+          },
+          "sources": {
+            "type": "keyword"
+          }
+        }
+      },
+      "competitors_chart": {
+        "properties": {
+          "colors": {
+            "type": "keyword"
+          },
+          "da_scores": {
+            "type": "integer"
+          },
+          "da_scores_percentages": {
+            "type": "float"
+          },
+          "domains": {
+            "type": "keyword"
+          }
+        }
+      },
+      "influencer_chart": {
+        "properties": {
+          "theme": {
+            "type": "text"
+          },
+          "documents": {
+            "type": "nested",
+            "properties": {
+              "author": {
+                "type": "keyword"
+              },
+              "title": {
+                "type": "text"
+              },
+              "description": {
+                "type": "text"
+              },
+              "likes": {
+                "type": "double"
+              },
+              "source": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      },
+      "leads_chart": {
+        "properties": {
+          "interests": {
+            "type": "text"
+          },
+          "texts": {
+            "type": "nested",
+            "properties": {
+              "author": {
+                "type": "keyword"
+              },
+              "source": {
+                "type": "keyword"
+              },
+              "text": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
