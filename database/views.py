@@ -37,7 +37,7 @@ elasticsearch_instance = ElasticsearchConfig.get_instance()
 @csrf_exempt
 def post(request):
     if request.method == 'POST':
-        data_path = os.path.join(os.path.dirname(__file__), 'serialization', 'influencer_data.json')
+        data_path = os.path.join(os.path.dirname(__file__), 'serialization', 'influencer-update.json')
 
         mention= request.POST.get("mention") 
         with open(data_path, 'r') as f:
