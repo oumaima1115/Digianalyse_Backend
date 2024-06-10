@@ -59,8 +59,9 @@ def find_insert_or_delete_market_charts(index_digianalyse, charts, mention):
     new_document = MarketChartDocument(
         user_id=charts.get("user_id"),
         mention=mention,
-        influencer_chart=charts.get("influencer_chart"),
-        leads_chart=charts.get("leads_chart")
+        influencer_chart=charts,
+        # influencer_chart=charts.get("influencer_chart"),
+        # leads_chart=charts.get("leads_chart")
     )
     
     new_documents.append(new_document.to_dict(True))

@@ -30,54 +30,82 @@ from elasticsearch_dsl import connections
 from elasticsearch.helpers import bulk
 from .testsavedata import save_to_json
 
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from elasticsearch_dsl import connections
+import json
+import os
+from .db import find_insert_or_delete_market_charts, ElasticsearchConfig
 
-elasticsearch_instance = ElasticsearchConfig.get_instance() 
-
+elasticsearch_instance = ElasticsearchConfig.get_instance()
 
 @csrf_exempt
 def post(request):
     if request.method == 'POST':
         data_path = os.path.join(os.path.dirname(__file__), 'serialization', 'influencer-update.json')
 
-        mention= request.POST.get("mention") 
-        with open(data_path, 'r') as f:
-            charts = json.load(f)
-        
-        res = find_insert_or_delete_market_charts(elasticsearch_instance.index_digianalyse, charts, mention)
+        mention = request.POST.get("mention")
+        if not mention:
+            return HttpResponseBadRequest("Mention parameter is missing")
 
-        return JsonResponse(res, safe=False)
+        try:
+            # Test Elasticsearch connection
+            es_conn = connections.get_connection()
+            if not es_conn.ping():
+                return HttpResponseBadRequest("Elasticsearch connection failed")
+        except Exception as e:
+            return HttpResponseBadRequest(f"Elasticsearch connection error: {str(e)}")
+
+        try:
+            with open(data_path, 'r') as f:
+                charts = json.load(f)
+            
+            res = find_insert_or_delete_market_charts(elasticsearch_instance.index_digianalyse, charts, mention)
+            return JsonResponse(res, safe=False)
+        except Exception as e:
+            return HttpResponseBadRequest(f"An error occurred: {str(e)}")
     else:
         return HttpResponseBadRequest("Only POST requests are allowed for this endpoint.")
-
 
 @csrf_exempt
 def get_user_data(request):
     if request.method == 'POST':
-        es = connections.get_connection()
-        
+        # Check if 'mention' parameter exists in the request
         mention_request = request.POST.get("mention")
+        if not mention_request:
+            return HttpResponseBadRequest("Mention parameter is missing")
 
-        search = Search(using=es, index="digianalyse").query("match", mention=mention_request)
-
-        response = search.execute()
-
-        if response.hits.total.value > 0:
-            user_data = response.hits[0].to_dict()
-            mention = user_data.get('mention', "")
-            influencer_chart = user_data.get('influencer_chart', {})
-            leads_chart = user_data.get('leads_chart', {})
+        try:
+            # Test Elasticsearch connection
+            es_conn = connections.get_connection()
+            if not es_conn.ping():
+                return HttpResponseBadRequest("Elasticsearch connection failed")
             
-            return JsonResponse({
-                "mention": mention,
-                "influencer_chart": influencer_chart,
-                "leads_chart": leads_chart
-            })
-        else:
-            return JsonResponse({
-                "message": "No data found for the provided mention"
-            }, status=404)
+            # Perform Elasticsearch search
+            search = Search(using=es_conn, index="digianalyse").query("match", mention=mention_request)
+            response = search.execute()
+
+            if response.hits.total.value > 0:
+                # Extract user data if found
+                user_data = response.hits[0].to_dict()
+                mention = user_data.get('mention', "")
+                influencer_chart = user_data.get('influencer_chart', {})
+                leads_chart = user_data.get('leads_chart', {})
+                
+                return JsonResponse({
+                    "mention": mention,
+                    "influencer_chart": influencer_chart,
+                    "leads_chart": leads_chart
+                })
+            else:
+                return JsonResponse({
+                    "message": "No data found for the provided mention"
+                }, status=404)
+        except Exception as e:
+            return HttpResponseBadRequest(f"An error occurred: {str(e)}")
     else:
         return HttpResponseBadRequest("Only POST requests are allowed for this endpoint.")
+
 
 
 #

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from pathlib import Path
 from elasticsearch_dsl import connections
+import os
 
 DEBUG = True
 ROOT_URLCONF = 'database.urls'
@@ -18,13 +19,20 @@ ROOT_URLCONF = 'database.urls'
 BASE_DIR = Path(__file__).resolve().parent.parent
 APPEND_SLASH = False
 
-URL_ELASTIC = "http://elasticsearch:9200"
+# URL_ELASTIC = "http://elasticsearch:9200"
+
+# def setup_elasticsearch_connection():
+#     connections.create_connection(alias='default', hosts=[URL_ELASTIC])
+
+# setup_elasticsearch_connection()
+
+
+URL_ELASTIC = os.getenv("URL_ELASTIC", "http://localhost:9200")
 
 def setup_elasticsearch_connection():
     connections.create_connection(alias='default', hosts=[URL_ELASTIC])
 
 setup_elasticsearch_connection()
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
