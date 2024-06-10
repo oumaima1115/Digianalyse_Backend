@@ -1,7 +1,7 @@
 import numpy as np
 import hashlib
 import matplotlib.pyplot as plt
-from collections import defaultdict
+# from collections import defaultdict
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 from sentence_transformers import SentenceTransformer

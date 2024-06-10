@@ -959,134 +959,164 @@ def instagram_scrap(request):
 #
 #
 #
+import requests
+import concurrent.futures
+import time
 
-# Fetch a page of LinkedIn posts
-async def fetch_page(session, url, headers, params):
-    async with session.get(url, headers=headers, params=params) as response:
-        return await response.json()
-
-# Fetch detailed post information including likes and descriptions
-async def fetch_posts_linkedin(session, linkedin_per_author, urlprofile, headers):
-    profile_url = linkedin_per_author.get("source_link")
-    if not profile_url:
-        print("Profile URL is missing from the author data.")
-        return None
-    
-    payload = {
-        "profileUrl": profile_url,
-        "includePosts": True
-    }
-    
-    async with session.post(urlprofile, json=payload, headers=headers) as response:
-        data = await response.json()
-        if data.get("result", {}).get("posts"):
-            posts = data["result"]["posts"]
-            likes = [post.get("reactionCount", 0) for post in posts]
-            post_descriptions = [post.get("postDescription", "") for post in posts]
-            return {"like": likes, "description": post_descriptions}
-        else:
-            return None
-
-# Main scraping function
-async def linkedin_scrap(request):
-    linkedin_rapid_api_url = 'https://linkedin-public-search.p.rapidapi.com/postsearch'
-    urlprofile = "https://linkedin-public-search.p.rapidapi.com/getpeoplebyurl"
-    mention = "french"
-    hashtag_pattern = "#\\w+"
-    mention_pattern = "@\\w+"
-    y_m_dTHM_format = "%Y-%m-%dT%H:%M"
-    post_type = "video"
-    user_id = "12345"
-
+def fetch_linkedin_profile_posts(profile):
+    url = "https://linkedin-data-api.p.rapidapi.com/get-profile-posts"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        "X-RapidAPI-Key": "0fad9a3463mshf8561e48c7f404dp171289jsn3584d0200f72",
-        "X-RapidAPI-Host": "linkedin-public-search.p.rapidapi.com"
+        "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
+        "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com"
     }
 
-    total_pages = 5
-    start_time = time.time()
-    linkedin_descriptions_list = []
+    querystring = {"username": profile["username"]}
+    response = requests.get(url, headers=headers, params=querystring)
+    data = response.json()
+    items = data.get("data", [])
+    
+    likes = []
+    descriptions = []
+    for item in items:
+        descriptions.append(item.get("text", ""))
+        likes.append(item.get("likeCount", 0))
+    
+    profile["like"] = likes
+    profile["description"] = descriptions
+    
+    return profile
 
-    async with aiohttp.ClientSession() as session:
-        fetch_page_tasks = [
-            fetch_page(session, linkedin_rapid_api_url, headers, {
-                "keyword": mention,
-                "page": str(page),
-                "includePostURLs": "true",
-                "limit": "10"
-            }) for page in range(1, total_pages + 1)
-        ]
+
+def search_linkedin_posts(mention):
+    url = "https://linkedin-data-api.p.rapidapi.com/search-posts"
+    payload = {
+        "keyword": mention
+    }
+    headers = {
+        "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
+        "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    data = response.json()
+    items = data.get("data", {}).get("items", [])
+
+    profiles = []
+    for item in items:
+        username = item.get("author", {}).get("username", "")
+        author = item.get("author", {}).get("fullName", "")
+        linkedin_post_source_link = item.get("url", {})
         
-        page_responses = await asyncio.gather(*fetch_page_tasks)
+        profiles.append({
+            "username": username,
+            "author": author,
+            "source": "linkedin",
+            "source_link": linkedin_post_source_link,
+            "mention": mention,
+            "mentions_texts": mention,
+            "hashtags_texts": mention,
+        })
+    
+    return profiles
 
-        for data in page_responses:
-            results = data.get("result", [])
-            if not results:
-                continue
-            for description in results:
-                try:
-                    description_title = description.get("postDescription")
-                    if not description_title or not isinstance(description_title, str):
-                        continue
-                    profile_url = description.get("postURL")
-                    mentions = re.findall(mention_pattern, description_title)
-                    hashtags = re.findall(hashtag_pattern, description_title)
+def linkedin_scrap(request):
+    mention="golang"
+    profiles = search_linkedin_posts(mention)
+    if not profiles:
+        print("No profiles found for the given keyword.")
+        return []
 
-                    post_utc_date_str = description.get("postUtcDate")
-                    if post_utc_date_str:
-                        if len(post_utc_date_str.split('.')) > 1:
-                            date_part, time_part = post_utc_date_str.split('T')
-                            time_main, time_frac = time_part.split('.')
-                            time_frac = time_frac[:6]  # Keep only the first six digits
-                            post_utc_date_str = f"{date_part}T{time_main}.{time_frac}"
-                        try:
-                            video_date = datetime.fromisoformat(post_utc_date_str.rstrip("Z")).strftime(y_m_dTHM_format)
-                        except ValueError:
-                            video_date = None
-                    else:
-                        video_date = None
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(fetch_linkedin_profile_posts, profile) for profile in profiles]
+        results = []
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                result = future.result()
+                results.append(result)
+                print("Profile data:", result)
+            except Exception as e:
+                print(f"An error occurred: {e}")
+    if results:
+        save_to_json(results,"linkedin")
 
-                    author_id = description.get("nameSurname", {})
-                    
-                    linkedin_document = {
-                        "user_id": user_id,
-                        "text": description_title,
-                        "type": post_type,
-                        "source": "linkedin",
-                        "source_link": profile_url,
-                        "date": video_date,
-                        "mention": mention,
-                        "nbr_mentions": len(mentions),
-                        "nbr_hashtags": len(hashtags),
-                        "mentions_texts": mentions,
-                        "hashtags_texts": hashtags,
-                        "author": author_id,
-                        "like": [],
-                        "description": []
-                    }
+    return JsonResponse(results, safe=False)
 
-                    linkedin_descriptions_list.append(linkedin_document)
-                except KeyError:
-                    continue
+#
+#
+#
+#
+# pinterest
+#
+#
+#
 
-        if not linkedin_descriptions_list:
-            print(f"No LinkedIn posts found for mention {mention}")
-        else:
-            fetch_author_info_tasks = [
-                fetch_posts_linkedin(session, author, urlprofile, headers) for author in linkedin_descriptions_list
-            ]
-            
-            author_infos = await asyncio.gather(*fetch_author_info_tasks)
-            
-            for linkedin, author_info in zip(linkedin_descriptions_list, author_infos):
-                if author_info is not None:
-                    linkedin["like"] = author_info["like"]
-                    linkedin["description"] = author_info["description"]
 
-    end_time = time.time()
-    duration = end_time - start_time
-    print(f"The LinkedIn function took {duration:.2f} seconds to complete")
-    print(f"Number of records in linkedin_descriptions_list: {len(linkedin_descriptions_list)}")
+def fetch_pinterest_data(profile):
+    url = "https://pinterest-scraper.p.rapidapi.com/profile/"
+    headers = {
+        "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
+        "x-rapidapi-host": "pinterest-scraper.p.rapidapi.com"
+    }
+    querystring = {"username": profile["username"]}
+    response = requests.get(url, headers=headers, params=querystring)
 
-    return JsonResponse(linkedin_descriptions_list, safe=False)
+    try:
+        data = response.json()
+        text = data.get("data", {}).get("about", "")
+        like = data.get("data", {}).get("follower_count", 0)
+
+        profile["like"] = like
+        profile["description"] = text
+    except Exception as e:
+        print(f"An error occurred while fetching data for {profile['username']}: {e}")
+
+    return profile
+
+def pinterest_scrap(request):
+    items=30
+    mention="nasa"
+    url_search = "https://pinterest-scraper.p.rapidapi.com/search/"
+    headers = {
+        "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
+        "x-rapidapi-host": "pinterest-scraper.p.rapidapi.com"
+    }
+    querystring = {"keyword": mention}
+    response = requests.get(url_search, headers=headers, params=querystring)
+
+    profiles = []
+    try:
+        data = response.json()
+        search_items = data.get("data", {}).get("items", [])
+        
+        for item in search_items:
+            if len(profiles) >= items:
+                break
+            if item.get("username", ""):
+                username = item.get("username", "")
+                author = item.get("full_name", "")
+                pinterest_post_source_link = f"https://www.pinterest.fr/{username}/"
+
+                profiles.append({
+                    "username": username,
+                    "author": author,
+                    "source": "pinterest",
+                    "source_link": pinterest_post_source_link,
+                    "mention": mention,
+                    "mentions_texts": mention,
+                    "hashtags_texts": mention,
+                })
+    except Exception as e:
+        print(f"An error occurred during the search: {e}")
+    
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(fetch_pinterest_data, profile) for profile in profiles]
+        profiles_with_data = []
+        for future in as_completed(futures):
+            profile_data = future.result()
+            if profile_data.get("like") and profile_data.get("description"):
+                profiles_with_data.append(profile_data)
+
+    save_to_json(profiles_with_data,"pinterest")
+    
+    return JsonResponse(profiles_with_data, safe=False)

@@ -9,5 +9,6 @@ urlpatterns = [
     path('reddit_scrap/', views.reddit_scrap, name='reddit_scrap'),
     path('tiktok_scrap/', views.tiktok_scrap, name='tiktok_scrap'),
     path('instagram_scrap/', views.instagram_scrap, name='instagram_scrap'),
-    path('linkedin_scrap/', views.linkedin_scrap, name='linkedin_scrap') 
+    path('linkedin_scrap/', views.linkedin_scrap, name='linkedin_scrap'),
+    path('pinterest_scrap/', views.pinterest_scrap, name='pinterest_scrap')
 ]
