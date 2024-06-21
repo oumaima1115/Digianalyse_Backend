@@ -54,14 +54,13 @@ class MarketChartDocument(Document):
     )
 
 
-def find_insert_or_delete_market_charts(index_digianalyse, charts, mention):
+def find_insert_or_delete_market_charts(index_digianalyse, influencer,  leads, mention):
     new_documents = []
     new_document = MarketChartDocument(
-        user_id=charts.get("user_id"),
+        user_id="123456789",
         mention=mention,
-        influencer_chart=charts,
-        # influencer_chart=charts.get("influencer_chart"),
-        # leads_chart=charts.get("leads_chart")
+        influencer_chart=influencer,
+        leads_chart=leads
     )
     
     new_documents.append(new_document.to_dict(True))
@@ -70,4 +69,3 @@ def find_insert_or_delete_market_charts(index_digianalyse, charts, mention):
         connections.get_connection(),
         actions=new_documents,
         index=index_digianalyse)
-    return charts

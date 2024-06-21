@@ -5,6 +5,7 @@ Django==3.2
 django-filter==22.1
 django-jsonfield==1.4.1
 djangorestframework==3.14.0
+django-cors-headers==3.13.0
 python-decouple==3.6
 pyarabic
 celery
@@ -17,9 +18,12 @@ psycopg2-binary
 gunicorn
 eventlet
 pandas 
-openai 
-numpy 
+openai
+numpy<2.0
 matplotlib
 aiohttp
 praw
 google-api-python-client
+scikit-learn
+spacy
+nltk
