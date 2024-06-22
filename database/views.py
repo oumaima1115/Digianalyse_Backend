@@ -95,7 +95,7 @@ def post(request):
                     reddit_data, 
                     linkedin_data
                 )
-
+                
                 cluster_themes = clustering(influencer_data, leads_data)
                 influencer = generate(cluster_themes['influencers_charts'])
                 leads = generate_interests(cluster_themes.get("leads_charts"))
@@ -135,7 +135,7 @@ def classify_sentiment(text):
 def predictclass(request):
     if request.method == 'POST':
         try:
-            request_data = json.loads(request.body)  # Parse the JSON data from the request body
+            request_data = json.loads(request.body)
 
             if not isinstance(request_data, list):
                 return JsonResponse({"error": "Expected a list of clusters"}, status=400)

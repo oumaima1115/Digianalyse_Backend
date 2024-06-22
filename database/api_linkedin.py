@@ -14,8 +14,8 @@ import concurrent.futures
 def fetch_linkedin_profile_posts(profile):
     url = "https://linkedin-data-api.p.rapidapi.com/get-profile-posts"
     headers = {
-      "x-rapidapi-key": "bcf17d2b43msh7b704af227742b6p1f3cd4jsn4622d32cf51d",
-      "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com"
+        "x-rapidapi-key": "963b4e78b3msh95db887e195252bp112fd6jsn84e50ea45f6e",
+        "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com"
     }
 
     querystring = {"username": profile["username"]}
@@ -56,9 +56,9 @@ def search_linkedin_posts(mention):
         "keyword": mention
     }
     headers = {
-      "x-rapidapi-key": "bcf17d2b43msh7b704af227742b6p1f3cd4jsn4622d32cf51d",
-      "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
-      "Content-Type": "application/json"
+        "x-rapidapi-key": "963b4e78b3msh95db887e195252bp112fd6jsn84e50ea45f6e",
+        "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
+        "Content-Type": "application/json"
     }
 
     response = requests.post(url, json=payload, headers=headers)

@@ -16,7 +16,7 @@ from .testsavedata import save_to_json
 
 def fetch_instagram_data(instagram_document):
     headers = {
-        "x-rapidapi-key": "bcf17d2b43msh7b704af227742b6p1f3cd4jsn4622d32cf51d",
+        "x-rapidapi-key": "963b4e78b3msh95db887e195252bp112fd6jsn84e50ea45f6e",
         "x-rapidapi-host": "instagram-scraper-api2.p.rapidapi.com"
     }
     url_posts = "https://instagram-scraper-api2.p.rapidapi.com/v1.2/posts"
@@ -70,7 +70,7 @@ def instagram_scrap(mention):
                 querystring = {"hashtag": mention, "pagination_token": next_cursor} if next_cursor else {"hashtag": mention}
 
                 headers = {
-                    "x-rapidapi-key": "bcf17d2b43msh7b704af227742b6p1f3cd4jsn4622d32cf51d",
+                    "x-rapidapi-key": "963b4e78b3msh95db887e195252bp112fd6jsn84e50ea45f6e",
                     "x-rapidapi-host": "instagram-scraper-api2.p.rapidapi.com"
                 }
                 response = requests.get(instagram_rapid_api_url, headers=headers, params=querystring)

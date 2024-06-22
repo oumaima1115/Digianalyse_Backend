@@ -130,7 +130,7 @@ def tiktok_scrap(mention):
         querystring = {"keywords":"Beautiful","count":"10","cursor":"0","region":"US","publish_time":"0","sort_type":"0"}
 
         headers = {
-            "x-rapidapi-key": "4547d03582msh4a6a777154b651fp13e1c0jsn66b059435328",
+            "x-rapidapi-key": "bcf17d2b43msh7b704af227742b6p1f3cd4jsn4622d32cf51d",
             "x-rapidapi-host": "tiktok-video-feature-summary.p.rapidapi.com"
         }
 

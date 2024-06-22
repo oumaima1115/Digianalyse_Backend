@@ -40,7 +40,6 @@ def clustering(influencer_data, leads_data):
     n_samples_leads = X_leads.shape[0]
     n_clusters_leads = min(5, n_samples_leads)
 
-    # Define clustering algorithms
     clustering_algorithms_influencers = {
         'KMeans': KMeans(n_clusters=n_clusters_influencers, random_state=42),
         'Agglomerative': AgglomerativeClustering(n_clusters=n_clusters_influencers),
@@ -55,7 +54,6 @@ def clustering(influencer_data, leads_data):
         'Birch': Birch(n_clusters=n_clusters_leads)
     }
 
-    # Evaluation metrics
     evaluation_metrics = {
         'Silhouette Score': silhouette_score,
         'Davies-Bouldin Index': davies_bouldin_score,
@@ -80,7 +78,6 @@ def clustering(influencer_data, leads_data):
         # print(f"\nResults for {algorithm}:")
         # print("Cluster labels:", cluster_labels_influencers)
 
-        # Collect cluster documents for themes
         cluster_themes_influencers = {}
 
         for cluster_id in range(n_clusters_influencers):
@@ -168,3 +165,8 @@ def clustering(influencer_data, leads_data):
     }
 
     return best_clusters
+
+
+#reglage hyper parameter => n7asnou les scores 
+#dbscan > uncluster
+#metrics
