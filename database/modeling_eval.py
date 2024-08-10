@@ -7,16 +7,15 @@ import re
 def clustering(influencer_data, leads_data):
     
     def clean_description(text):
-        # Check if text is a list or a string and handle accordingly
         if isinstance(text, list):
             text = ' '.join(text)
         text = text.encode('ascii', 'ignore').decode('ascii') if isinstance(text, str) else ''
-        text = re.sub(r'\n+', ' ', text)  # Remove multiple newlines
-        text = re.sub(r'\s+', ' ', text)  # Remove extra whitespaces
-        text = re.sub(r'[^\w\s]', '', text)  # Remove non-alphanumeric characters
+        text = re.sub(r'\n+', ' ', text)  #multiple newlines
+        text = re.sub(r'\s+', ' ', text)  #extra whitespaces
+        text = re.sub(r'[^\w\s]', '', text)  #non-alphanumeric characters
         return text.strip()
 
-    # Clean the 'description' field from all objects in data
+    #clean
     influencers_texts = [clean_description(d.get('description', '')) for d in influencer_data]
     leads_texts = [clean_description(d.get('description', '')) for d in leads_data]
 
@@ -36,7 +35,6 @@ def clustering(influencer_data, leads_data):
     # Determine the number of clusters
     n_samples_influencers = X_influencers.shape[0]
     n_clusters_influencers = min(5, n_samples_influencers) 
-    
     n_samples_leads = X_leads.shape[0]
     n_clusters_leads = min(5, n_samples_leads)
 
@@ -74,10 +72,6 @@ def clustering(influencer_data, leads_data):
         cluster_labels_influencers = algo_influencers.fit_predict(X_dense)
         algo_results_influencers['Cluster labels'] = cluster_labels_influencers.tolist()
 
-        # Print cluster labels
-        # print(f"\nResults for {algorithm}:")
-        # print("Cluster labels:", cluster_labels_influencers)
-
         cluster_themes_influencers = {}
 
         for cluster_id in range(n_clusters_influencers):
@@ -105,10 +99,6 @@ def clustering(influencer_data, leads_data):
 
         cluster_labels_leads = algo_leads.fit_predict(X_dense)
         algo_results_leads['Cluster labels'] = cluster_labels_leads.tolist()
-
-        # Print cluster labels
-        # print(f"\nResults for {algorithm}:")
-        # print("Cluster labels:", cluster_labels_leads)
 
         # Collect cluster documents for interests
         cluster_interests_leads = {}
@@ -145,18 +135,9 @@ def clustering(influencer_data, leads_data):
         results[algo_name_leads] = algo_results
         cluster_all["leads_charts"][algo_name_leads] = cluster_interests
 
-    # Print evaluation results
-    # for algo_name, algo_result in results.items():
-    #     print(f"\nResults for {algo_name}:")
-    #     for metric_name, score in algo_result.items():
-    #         if metric_name != 'Cluster labels':
-    #             print(f"{metric_name}: {score}")
-
     # Choose the best method based on the evaluation metrics
     best_evaluation_metric = 'Silhouette Score'
     best_method = max(results, key=lambda x: results[x].get(best_evaluation_metric, float('-inf')))
-
-    # print(f"\nBest clustering method based on {best_evaluation_metric}: {best_method}")
 
     # Get the cluster themes and interests for the best method
     best_clusters = {
@@ -165,8 +146,3 @@ def clustering(influencer_data, leads_data):
     }
 
     return best_clusters
-
-
-#reglage hyper parameter => n7asnou les scores 
-#dbscan > uncluster
-#metrics

@@ -27,3 +27,5 @@ google-api-python-client
 scikit-learn
 spacy
 nltk
+imbalanced-learn
+xgboost

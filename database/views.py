@@ -17,10 +17,19 @@ from .api_reddit import reddit_scrap
 from .api_tiktok import tiktok_scrap
 from .api_twitter import twitter_scrap
 from .api_google import google_scrap
-
+from .api_best_hashtag import api_besthashtag
+from .classification_hashtag import classificationHashtag
 
 elasticsearch_instance = ElasticsearchConfig.get_instance()
 
+@csrf_exempt
+def besthashtag(request):
+    data_df = api_besthashtag()
+    topics_data = classificationHashtag(data_df)
+    res = {
+        "topics_chart": topics_data
+    }
+    return JsonResponse(res, safe=False)
 
 def get_user_data(mention):
     try:
@@ -49,7 +58,6 @@ def get_user_data(mention):
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}
 
-    
 @csrf_exempt
 def post(request):
     if request.method == 'POST':
