@@ -5,7 +5,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from elasticsearch_dsl import Search, connections
-from .db import find_insert_or_delete_market_charts, ElasticsearchConfig
+from .db import find_insert_or_delete_market_charts, find_insert_or_delete_topics_charts, ElasticsearchConfig
 from .combinefiletest import combine_json_files
 from .modeling_eval import clustering
 from .generate_theme import generate
@@ -20,17 +20,60 @@ from .api_google import google_scrap
 from .api_best_hashtag import api_besthashtag
 from .classification_hashtag import classificationHashtag
 
+
 elasticsearch_instance = ElasticsearchConfig.get_instance()
 
 @csrf_exempt
 def besthashtag(request):
+    try:
+        es_conn = connections.get_connection()
+        if not es_conn.ping():
+            return HttpResponseBadRequest("Elasticsearch connection failed")
+    except Exception as e:
+        return HttpResponseBadRequest(f"Elasticsearch connection error: {str(e)}")
+    
+    # Process and update Elasticsearch with new data
     data_df = api_besthashtag()
     topics_data = classificationHashtag(data_df)
-    res = {
-        "topics_chart": topics_data
-    }
-    return JsonResponse(res, safe=False)
+    find_insert_or_delete_topics_charts(elasticsearch_instance.index_seo, topics_data)
+    
+    # Fetch the latest topics data
+    latest_topics_data = get_topics_data()
+    
+    if 'error' in latest_topics_data:
+        return HttpResponseBadRequest(f"Error fetching data: {latest_topics_data['error']}")
+    
+    return JsonResponse(latest_topics_data, safe=False)
 
+def get_topics_data():
+    try:
+        es_conn = connections.get_connection()
+        if not es_conn.ping():
+            return {"error": "Elasticsearch connection failed"}
+
+        # Perform Elasticsearch search with sorting
+        user_id = 123456789
+        search = Search(using=es_conn, index="seo") \
+            .query("match", user_id=user_id) \
+            .sort("-timestamp") 
+        response = search.execute()
+
+        if response.hits.total.value > 0:
+            # Extract user data if found
+            user_data = response.hits[0].to_dict()
+            user_id = user_data.get('user_id', "")
+            topics_chart = user_data.get('topics_chart', {})
+
+            return {
+                "user_id": user_id,
+                "topics_chart": topics_chart,
+            }
+        else:
+            return None
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}
+
+    
 def get_user_data(mention):
     try:
         es_conn = connections.get_connection()
