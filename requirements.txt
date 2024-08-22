@@ -13,6 +13,8 @@ django-celery-results==1.2.1
 celery-progress
 psutil==5.8.0
 memory-profiler==0.58.0
+scikit-learn-extra
+seaborn
 sqlalchemy
 psycopg2-binary
 gunicorn

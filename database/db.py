@@ -19,6 +19,7 @@ class ElasticsearchConfig:
         self.es = Elasticsearch("http://localhost:9200")
         self.index_digianalyse = "digianalyse"
         self.index_seo = "seo"
+        self.index_domain = "domain"
 
     def delete_by_query(self, index, body):
         self.es.delete_by_query(index=index, body=body)
@@ -65,6 +66,20 @@ class SeoChartDocument(Document):
         }
     )
 
+class DomainChartDocument(Document):
+    domain = Keyword()
+    timestamp = Date() 
+    domain_chart = Nested(
+        properties={
+            "domains": Object(), 
+            "da_scores_percentages": Object(), 
+            "pa_scores_percentages": Object(),
+            "spam_scores": Object(),
+            "total_backlinks": Object(),
+            "colors": Object(),
+            "clusters": Object()
+        }
+    )
 
 def find_insert_or_delete_market_charts(index_digianalyse, influencer,  leads, mention):
     new_documents = []
@@ -99,7 +114,6 @@ def find_insert_or_delete_topics_charts(index_seo, topics_chart):
         actions=new_documents,
         index=index_seo)
 
-    
 # {
 #   "settings": {
 #     "number_of_shards": 2,
@@ -133,3 +147,61 @@ def find_insert_or_delete_topics_charts(index_seo, topics_chart):
 #   }
 # }
 
+
+def find_insert_or_delete_domain_charts(index_domain, domain, domain_chart):
+    new_documents = []
+    new_document = DomainChartDocument(
+        domain=domain,
+        timestamp=datetime.now(),
+        domain_chart=domain_chart
+    )
+    
+    new_documents.append(new_document.to_dict(True))
+    
+    bulk(
+        connections.get_connection(),
+        actions=new_documents,
+        index=index_domain)
+    
+
+# {
+#   "settings": {
+#     "number_of_shards": 2,
+#     "number_of_replicas": 1
+#   },
+#   "mappings": {
+#     "properties": {
+#       "domain": {
+#         "type": "keyword"
+#       },
+#       "timestamp": {
+#         "type": "date"
+#       },
+#       "domain_chart": {
+#         "properties": {
+#           "domains": {
+#             "type": "object"
+#           },
+#           "da_scores_percentages": {
+#             "type": "object"
+#           },
+#           "pa_scores_percentages": {
+#             "type": "object"
+#           },
+#           "spam_scores": {
+#             "type": "object"
+#           },
+#           "total_backlinks": {
+#             "type": "object"
+#           },
+#           "colors": {
+#             "type": "object"
+#           },
+#           "clusters": {
+#             "type": "object"
+#           }
+#         }
+#       }
+#     }
+#   }
+# }
