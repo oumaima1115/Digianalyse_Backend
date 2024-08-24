@@ -17,6 +17,7 @@ scikit-learn-extra
 seaborn
 sqlalchemy
 psycopg2-binary
+transformers
 gunicorn
 eventlet
 pandas 
