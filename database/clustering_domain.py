@@ -9,7 +9,6 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import OPTICS
 import seaborn as sns
-from .generate_clusters_name import generate_cluster_names
 
 def clustering_domains(data):
     # Fonction pour générer des couleurs dynamiques
@@ -109,7 +108,6 @@ def clustering_domains(data):
 
     initial_df['spam_score'].fillna(0, inplace=True)
 
-    # Create a dictionary to group domains by cluster label
     clusters = df['cluster'].tolist()
     domains = initial_df['Site'].tolist()
     domains_per_cluster = {}
@@ -119,16 +117,25 @@ def clustering_domains(data):
             domains_per_cluster[cluster] = []
         domains_per_cluster[cluster].append(domain)
 
-    # Generate cluster names
     clusters_list = generate_cluster_names(domains_per_cluster)
 
+    # Créer les listes pour le résultat JSON en utilisant les valeurs initiales
     result_json = {
         "domains": initial_df['Site'].tolist(),
         "da_scores_percentages": initial_df['domain_authority'].tolist(),
         "pa_scores_percentages": initial_df['page_authority'].tolist(),
-        "spam_scores": initial_df['spam_score'].tolist(),  
+        "spam_scores": initial_df['spam_score'].tolist(),  # Utilisez les valeurs d'origine ici
         "total_backlinks": initial_df['totalBacklinks'].tolist(),
-        "colors": colors,  
-        "clusters": clusters_list
+        "colors": colors,  # Couleurs dynamiques pour les éléments
+        "clusters": df['cluster'].tolist()
     }
+    print(result_json)
     return result_json
+    # # Affichage du résultat JSON
+    # print("Résultat JSON:")
+    # print(json.dumps(result_json, indent=4))
+
+    # # Sauvegarde du résultat JSON dans un fichier
+    # with open('final_result.json', 'w') as f:
+    #     json.dump(result_json, f, indent=4)
+
