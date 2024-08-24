@@ -27,7 +27,7 @@ elasticsearch_instance = ElasticsearchConfig.get_instance()
 @csrf_exempt
 def bestdomains(request):
     try:
-        if request.domain == 'POST':
+        if request.method == 'POST':
             domain = request.POST.get("domain")
 
             if not domain:
@@ -37,22 +37,38 @@ def bestdomains(request):
             if not es_conn.ping():
                 return HttpResponseBadRequest("Elasticsearch connection failed")
             
-            domain_data = get_domain_data(domain)
-            if domain_data:
-                return domain_data
-            else:
-                # data = get_domains_metrics(domain)
-                domain_data = clustering_domains()
+            existing_domain_data = get_domain_data(domain)
+            
+            if not existing_domain_data:
+                # Création de nouvelles données de domaine si le domaine n'existe pas
+                data = {
+                    'Site': ['facebook.com', 'bing.com', 'twitter.com', 'instagram.com', 'reddit.com',
+                            'altavista.com', 'github.com', 'linkedin.com', 'tiktok.com', 'canva.com',
+                            'gmail.com', 'ya.ru', 'yandex.ru', 'ask.com', 'lycos.com', 'duckduckgo.com',
+                            'tineye.com', 'baidu.com', 'gogle.com', 'yandex.com'],
+                    'totalBacklinks': [64552488179, 281220262, 55729341025, 37097540229, 1443483817,
+                                    10873884, 3128579142, 16105957084, 3257148852, 19996063,
+                                    15818721, 6787120, 1031289097, 8572704, 12576334, 27500918,
+                                    2558227, 12194099700, 34343, 47640094],
+                    'domain_authority': [96, 93, 95, 94, 92, 75, 96, 99, 95, 93,
+                                        93, 77, 93, 87, 92, 88, 75, 79, 45, 93],
+                    'page_authority': [100, 81, 100, 100, 89, 65, 93, 99, 86, 77,
+                                    80, 68, 81, 70, 82, 77, 67, 78, 53, 80],
+                    'spam_score': [1.0, 56.0, 31.0, 1.0, 3.0, 0.0, 1.0, 1.0, 18.0, 13.0,
+                                0.0, 22.0, 3.0, 3.0, 2.0, 9.0, 18.0, 1.0, 0.0, 7.0]
+                }
+                domain_data = clustering_domains(data)
+                print(f"Inserting domain data for {domain}")
                 find_insert_or_delete_domain_charts(elasticsearch_instance.index_domain, domain, domain_data)
-                
-                if 'error' in domain_data:
-                    return HttpResponseBadRequest(f"Error fetching data: {domain_data['error']}")
-                
-                return JsonResponse(domain_data, safe=False)
+            else:
+                # Mettre à jour les données existantes si elles sont trouvées
+                print(f"Updating existing domain data for {domain}")
+                domain_data = existing_domain_data['domain_chart']
+            
+            return JsonResponse(domain_data, safe=False)
         else:
             return HttpResponseBadRequest("Only POST requests are allowed for this endpoint.")
     except Exception as e:
-        # Log the exception if needed
         print(f"Exception occurred: {str(e)}")
         return HttpResponseBadRequest(f"An error occurred: {str(e)}")
 
@@ -62,22 +78,14 @@ def get_domain_data(domain):
         if not es_conn.ping():
             return {"error": "Elasticsearch connection failed"}
 
-        # Perform Elasticsearch search
         search = Search(using=es_conn, index="domain").query("match", domain=domain)
         response = search.execute()
 
         if response.hits.total.value > 0:
-            # Extract user data if found
             domain_data = response.hits[0].to_dict()
-            domain = domain_data.get('domain', "")
-            domain_chart = domain_data.get('top_competitors', {})
-
-            return {
-                "domain": domain,
-                "top_competitors": domain_chart,
-            }
+            return domain_data
         else:
-            return None
+            return {}
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}
     

@@ -1,5 +1,5 @@
 from datetime import datetime
-from elasticsearch_dsl import Document, Keyword, Text, Nested, Float, Object, Date
+from elasticsearch_dsl import Document, Keyword, Text, Nested, Float, Object, Date, Integer
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl.connections import connections
 from elasticsearch import Elasticsearch
@@ -68,16 +68,16 @@ class SeoChartDocument(Document):
 
 class DomainChartDocument(Document):
     domain = Keyword()
-    timestamp = Date() 
+    timestamp = Date()
     domain_chart = Nested(
         properties={
-            "domains": Object(), 
-            "da_scores_percentages": Object(), 
-            "pa_scores_percentages": Object(),
-            "spam_scores": Object(),
-            "total_backlinks": Object(),
-            "colors": Object(),
-            "clusters": Object()
+            "domains": Keyword(multi=True),
+            "da_scores_percentages": Integer(multi=True),
+            "pa_scores_percentages": Integer(multi=True),
+            "spam_scores": Float(multi=True),
+            "total_backlinks": Integer(multi=True),
+            "colors": Keyword(multi=True), 
+            "clusters": Integer(multi=True) 
         }
     )
 
@@ -180,25 +180,25 @@ def find_insert_or_delete_domain_charts(index_domain, domain, domain_chart):
 #       "domain_chart": {
 #         "properties": {
 #           "domains": {
-#             "type": "object"
+#             "type": "keyword"
 #           },
 #           "da_scores_percentages": {
-#             "type": "object"
+#             "type": "integer"
 #           },
 #           "pa_scores_percentages": {
-#             "type": "object"
+#             "type": "integer"
 #           },
 #           "spam_scores": {
-#             "type": "object"
+#             "type": "float"
 #           },
 #           "total_backlinks": {
-#             "type": "object"
+#             "type": "long"
 #           },
 #           "colors": {
-#             "type": "object"
+#             "type": "keyword"
 #           },
 #           "clusters": {
-#             "type": "object"
+#             "type": "integer"
 #           }
 #         }
 #       }

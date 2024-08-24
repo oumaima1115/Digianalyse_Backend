@@ -6,7 +6,7 @@ def get_similar_sites(domain):
     url = "https://similarsites1.p.rapidapi.com/v1/find-similar/"
     querystring = {"domain": domain}
     headers = {
-        "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
+        "x-rapidapi-key": "8e9dd20399msh09e9ced25a3fda9p157ea5jsn84c0bfbd8926",
         "x-rapidapi-host": "similarsites1.p.rapidapi.com"
     }
 
@@ -31,8 +31,8 @@ def get_majestic_metrics(site):
         url = "https://majestic1.p.rapidapi.com/url_metrics"
         querystring = {"url": site}
         headers = {
-          "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
-          "x-rapidapi-host": "majestic1.p.rapidapi.com"
+            "x-rapidapi-key": "8e9dd20399msh09e9ced25a3fda9p157ea5jsn84c0bfbd8926",
+            "x-rapidapi-host": "majestic1.p.rapidapi.com"
         }
         response = requests.get(url, headers=headers, params=querystring)
         response.raise_for_status()  # Raises an HTTPError for bad responses
@@ -47,9 +47,9 @@ def get_moz_metrics(site):
         url = "https://moz-da-pa1.p.rapidapi.com/v1/getDaPa"
         payload = {"q": site}
         headers = {
-          "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
-          "x-rapidapi-host": "moz-da-pa1.p.rapidapi.com",
-          "Content-Type": "application/json"
+            "x-rapidapi-key": "8e9dd20399msh09e9ced25a3fda9p157ea5jsn84c0bfbd8926",
+            "x-rapidapi-host": "moz-da-pa1.p.rapidapi.com",
+            "Content-Type": "application/json"
         }
         response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()  # Raises an HTTPError for bad responses
@@ -60,7 +60,7 @@ def get_moz_metrics(site):
 
 def get_domains_metrics(domain):
     sites = get_similar_sites(domain)
-    print("Fetched sites:", sites)  # Debug print to check the sites
+    print("Fetched sites:", sites) 
 
     # Initialiser une liste pour stocker les données
     data = []
