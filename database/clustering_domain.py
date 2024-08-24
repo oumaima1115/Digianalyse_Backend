@@ -9,7 +9,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import OPTICS
 import seaborn as sns
-from .generateCluster import generate_descriptive_names_with_transformers
+from .generateCluster import generate_cluster_names
 
 def clustering_domains(data):
     # Fonction pour générer des couleurs dynamiques
@@ -118,7 +118,7 @@ def clustering_domains(data):
             domains_per_cluster[cluster] = []
         domains_per_cluster[cluster].append(domain)
 
-    cluster_names = generate_descriptive_names_with_transformers(domains_per_cluster)
+    cluster_names = generate_cluster_names(domains_per_cluster)
     print("Cluster Names:", cluster_names)
         
     result_json = {
