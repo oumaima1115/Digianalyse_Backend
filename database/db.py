@@ -20,6 +20,7 @@ class ElasticsearchConfig:
         self.index_digianalyse = "digianalyse"
         self.index_seo = "seo"
         self.index_domain = "domain"
+        self.index_ranking = "ranking"
 
     def delete_by_query(self, index, body):
         self.es.delete_by_query(index=index, body=body)
@@ -78,6 +79,20 @@ class DomainChartDocument(Document):
             "total_backlinks": Integer(multi=True),
             "colors": Keyword(multi=True), 
             "clusters": Integer(multi=True) 
+        }
+    )
+
+class RankingChartDocument(Document):
+    keyword = Keyword()
+    timestamp = Date()
+    ranking_chart = Nested(
+        properties={
+            "volume": Float(multi=True),
+            "competition_index": Integer(multi=True),
+            "low_bid": Float(multi=True),
+            "high_bid": Float(multi=True),
+            "trend": Float(multi=True),
+            "keywords": Keyword(multi=True)
         }
     )
 
@@ -199,6 +214,61 @@ def find_insert_or_delete_domain_charts(index_domain, domain, domain_chart):
 #           },
 #           "clusters": {
 #             "type": "integer"
+#           }
+#         }
+#       }
+#     }
+#   }
+# }
+
+def find_insert_or_delete_ranking_charts(index_ranking, keyword, ranking_chart):
+    new_documents = []
+    new_document = RankingChartDocument(
+        keyword=keyword,
+        timestamp=datetime.now(),
+        ranking_chart=ranking_chart
+    )
+    
+    new_documents.append(new_document.to_dict(True))
+    
+    bulk(
+        connections.get_connection(),
+        actions=new_documents,
+        index=index_ranking
+    )
+
+# {
+#   "settings": {
+#     "number_of_shards": 2,
+#     "number_of_replicas": 1
+#   },
+#   "mappings": {
+#     "properties": {
+#       "keyword": {
+#         "type": "keyword"
+#       },
+#       "timestamp": {
+#         "type": "date"
+#       },
+#       "ranking_chart": {
+#         "properties": {
+#           "volume": {
+#             "type": "float"
+#           },
+#           "competition_index": {
+#             "type": "integer"
+#           },
+#           "low_bid": {
+#             "type": "float"
+#           },
+#           "high_bid": {
+#             "type": "float"
+#           },
+#           "trend": {
+#             "type": "float"
+#           },
+#           "keywords": {
+#             "type": "keyword"
 #           }
 #         }
 #       }

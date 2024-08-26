@@ -6,4 +6,6 @@ urlpatterns = [
     path('user/predictclass/', views.predictclass, name='predictclass'),
     path('seo/besthashtag/', views.besthashtag, name='besthashtag'),
     path('seo/bestdomains/', views.bestdomains, name='bestdomains'),
+    path('seo/ranking/', views.ranking, name="ranking")
+
 ]

@@ -9,7 +9,6 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import OPTICS
 import seaborn as sns
-from .generateCluster import generate_cluster_names
 
 def clustering_domains(data):
     # Fonction pour générer des couleurs dynamiques
@@ -109,18 +108,6 @@ def clustering_domains(data):
 
     initial_df['spam_score'].fillna(0, inplace=True)
 
-    clusters = df['cluster'].tolist()
-    domains = initial_df['Site'].tolist()
-    domains_per_cluster = {}
-
-    for domain, cluster in zip(domains, clusters):
-        if cluster not in domains_per_cluster:
-            domains_per_cluster[cluster] = []
-        domains_per_cluster[cluster].append(domain)
-
-    cluster_names = generate_cluster_names(domains_per_cluster)
-    print("Cluster Names:", cluster_names)
-        
     result_json = {
         "domains": initial_df['Site'].tolist(),
         "da_scores_percentages": initial_df['domain_authority'].tolist(),
