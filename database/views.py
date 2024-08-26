@@ -26,6 +26,7 @@ from .clustering_ranking import clusteringRanking
 
 elasticsearch_instance = ElasticsearchConfig.get_instance()
 
+
 @csrf_exempt
 def ranking(request):
     try:
@@ -33,26 +34,23 @@ def ranking(request):
             keyword = request.POST.get("keyword")
             if not keyword:
                 return HttpResponseBadRequest("keyword parameter is missing")
-            
+
             es_conn = connections.get_connection()
             if not es_conn.ping():
                 return HttpResponseBadRequest("Elasticsearch connection failed")
-            
+
             existing_ranking_data = get_ranking_data(keyword)
             
             if not existing_ranking_data:
                 data = get_ranking(keyword)
                 ranking_data = clusteringRanking(data)
                 print(f"Inserting keyword data for {keyword}")
-                try:
-                    find_insert_or_delete_ranking_charts(elasticsearch_instance.index_ranking, keyword, ranking_data)
-                except Exception as e:
-                    print(f"Error inserting data into Elasticsearch: {str(e)}")
-                    return HttpResponseBadRequest(f"An error occurred while inserting data: {str(e)}")
+                find_insert_or_delete_ranking_charts(elasticsearch_instance.index_ranking, keyword, ranking_data)
+                ranking_chart = ranking_data  # Ensure ranking_chart is assigned
             else:
                 print(f"Updating existing ranking data for {keyword}")
-                ranking_chart = existing_ranking_data['ranking_chart']
-            
+                ranking_chart = existing_ranking_data.get('ranking_chart', {})  # Ensure ranking_chart is assigned
+
             return JsonResponse(ranking_chart, safe=False)
         else:
             return HttpResponseBadRequest("Only POST requests are allowed for this endpoint.")
