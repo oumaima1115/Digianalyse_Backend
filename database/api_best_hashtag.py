@@ -6,8 +6,8 @@ def api_besthashtag():
 
     base_url = "https://trending-hashtags.p.rapidapi.com/api/trends/"
     headers = {
-      "x-rapidapi-key": "9e451e62bfmsh238f3eae5164e8ep176494jsn31a69a8b3191",
-      "x-rapidapi-host": "trending-hashtags.p.rapidapi.com"
+        "x-rapidapi-key": "4547d03582msh4a6a777154b651fp13e1c0jsn66b059435328",
+        "x-rapidapi-host": "trending-hashtags.p.rapidapi.com"
     }
 
     data_df = []

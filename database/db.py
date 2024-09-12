@@ -3,8 +3,6 @@ from elasticsearch_dsl import Document, Keyword, Text, Nested, Float, Object, Da
 from elasticsearch.helpers import bulk
 from elasticsearch_dsl.connections import connections
 from elasticsearch import Elasticsearch
-import logging
-import numpy as np
 
 class ElasticsearchConfig:
     _instance = None
@@ -87,12 +85,12 @@ class RankingChartDocument(Document):
     timestamp = Date()
     ranking_chart = Nested(
         properties={
-            "volume": Float(multi=True),
+            "volume": Integer(multi=True),
             "competition_index": Integer(multi=True),
             "low_bid": Float(multi=True),
             "high_bid": Float(multi=True),
             "trend": Float(multi=True),
-            "keywords": Keyword(multi=True)
+            "hashtag": Keyword(multi=True)
         }
     )
 
@@ -112,7 +110,7 @@ def find_insert_or_delete_market_charts(index_digianalyse, influencer,  leads, m
         actions=new_documents,
         index=index_digianalyse)
     
-#{"settings":{"number_of_shards":2,"number_of_replicas":1},"mappings":{"dynamic":false,"properties":{"user_id":{"type":"keyword"},"mention":{"type":"text"},"influencer_chart":{"properties":{"theme":{"type":"text"},"documents":{"type":"nested","properties":{"author":{"type":"keyword"},"title":{"type":"text"},"description":{"type":"text"},"likes":{"type":"double"},"source":{"type":"keyword"}}}}},"leads_chart":{"properties":{"interests":{"type":"text"},"texts":{"type":"nested","properties":{"author":{"type":"keyword"},"source":{"type":"keyword"},"text":{"type":"keyword"}}}}}}}}
+# {"settings":{"number_of_shards":2,"number_of_replicas":1},"mappings":{"dynamic":false,"properties":{"user_id":{"type":"keyword"},"mention":{"type":"text"},"influencer_chart":{"properties":{"theme":{"type":"text"},"documents":{"type":"nested","properties":{"author":{"type":"keyword"},"title":{"type":"text"},"description":{"type":"text"},"likes":{"type":"double"},"source":{"type":"keyword"}}}}},"leads_chart":{"properties":{"interests":{"type":"text"},"texts":{"type":"nested","properties":{"author":{"type":"keyword"},"source":{"type":"keyword"},"text":{"type":"keyword"}}}}}}}}
     
 def find_insert_or_delete_topics_charts(index_seo, topics_chart):
     new_documents = []
@@ -161,7 +159,6 @@ def find_insert_or_delete_topics_charts(index_seo, topics_chart):
 #     }
 #   }
 # }
-
 
 def find_insert_or_delete_domain_charts(index_domain, domain, domain_chart):
     new_documents = []
@@ -221,38 +218,20 @@ def find_insert_or_delete_domain_charts(index_domain, domain, domain_chart):
 #   }
 # }
 
-# Ensure correct conversion of numpy types to native types
-def convert_data_types(data):
-    if isinstance(data, dict):
-        for key, value in data.items():
-            if isinstance(value, dict):
-                convert_data_types(value)
-            elif isinstance(value, np.ndarray):
-                data[key] = value.tolist()
-            elif isinstance(value, np.int32):
-                data[key] = int(value)
-            elif isinstance(value, np.float32):
-                data[key] = float(value)
-    return data
-
 def find_insert_or_delete_ranking_charts(index_ranking, keyword, ranking_chart):
     new_documents = []
-    # Convert data types
-    ranking_chart_converted = convert_data_types(ranking_chart)
-    print("Converted ranking_chart:", ranking_chart_converted)  # Debugging line
     new_document = RankingChartDocument(
         keyword=keyword,
         timestamp=datetime.now(),
-        ranking_chart=ranking_chart_converted
+        ranking_chart=ranking_chart
     )
+
     new_documents.append(new_document.to_dict(True))
 
     bulk(
         connections.get_connection(),
         actions=new_documents,
-        index=index_ranking
-    )
-
+        index=index_ranking)
 
 # {
 #   "settings": {
@@ -270,7 +249,7 @@ def find_insert_or_delete_ranking_charts(index_ranking, keyword, ranking_chart):
 #       "ranking_chart": {
 #         "properties": {
 #           "volume": {
-#             "type": "float"
+#             "type": "integer"
 #           },
 #           "competition_index": {
 #             "type": "integer"
@@ -284,7 +263,7 @@ def find_insert_or_delete_ranking_charts(index_ranking, keyword, ranking_chart):
 #           "trend": {
 #             "type": "float"
 #           },
-#           "keywords": {
+#           "hashtag": {
 #             "type": "keyword"
 #           }
 #         }

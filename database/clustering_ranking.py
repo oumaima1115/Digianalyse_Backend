@@ -32,7 +32,7 @@ def clusteringRanking(data):
 
         # Ajouter les étiquettes de clusters aux données
         for i, item in enumerate(data_level):
-            item['cluster'] = clusters[i]
+            item['cluster'] = int(clusters[i])  # Convert cluster to native Python int
 
         # Organiser les données par cluster et niveau de compétition
         if level not in organized_data:
