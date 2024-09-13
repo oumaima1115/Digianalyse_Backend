@@ -23,24 +23,8 @@ from .classification_hashtag import classificationHashtag
 from .clustering_domain import clustering_domains
 from .api_ranking import get_ranking
 from .clustering_ranking import clusteringRanking
-from .finetuning import fine_tune_gpt2
 
 elasticsearch_instance = ElasticsearchConfig.get_instance()
-
-@csrf_exempt
-def fine_tune_model(request):
-    try:
-        # Call the fine-tuning process
-        test_prompt = "What are the most effective digital marketing strategies for a startup business?"
-    
-        # Fine-tune the model and generate text
-        result = fine_tune_gpt2(test_prompt)
-        print("Generated Text:\n", result)
-
-        # Once done, return success response
-        return JsonResponse({'message': 'Model fine-tuning completed successfully'})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def ranking(request):
