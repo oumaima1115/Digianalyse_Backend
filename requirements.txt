@@ -31,3 +31,4 @@ spacy
 nltk
 imbalanced-learn
 xgboost
+django-prometheus
