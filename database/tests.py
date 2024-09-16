@@ -34,7 +34,6 @@ from django.urls import reverse, resolve
 from database import views
 from django.http import JsonResponse
 
-
 class ApiBestHashtagTestCase(TestCase):
     @patch('api_best_hashtag.requests.get')
     def test_api_besthashtag_success(self, mock_get):
