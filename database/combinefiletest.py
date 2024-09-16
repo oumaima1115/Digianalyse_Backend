@@ -1,6 +1,3 @@
-import os
-import json
-
 def combine_json_files(*data_sources):
     combined_data = []
     

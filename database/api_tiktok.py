@@ -1,21 +1,8 @@
 import re
 import requests
-from .testsavedata import save_to_json
-
-#
-#
-#
-#
-# Tiktok
-#
-#
-#
-#
-#
-
-
 import concurrent.futures
 import urllib.parse
+
 
 def process_tiktok(tiktoks_list, headers):
     tiktok_url = "https://tiktok-video-feature-summary.p.rapidapi.com/user/posts"

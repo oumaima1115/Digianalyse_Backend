@@ -1,18 +1,6 @@
 import concurrent
 import time
 import requests
-from .testsavedata import save_to_json
-
-
-#
-#
-#
-# Instagram
-#
-#
-#
-#
-
 
 def fetch_instagram_data(instagram_document):
     headers = {

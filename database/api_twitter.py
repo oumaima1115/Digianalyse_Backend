@@ -2,16 +2,7 @@ import datetime
 import concurrent
 import re
 import requests
-from .testsavedata import save_to_json
 
-#
-#
-#
-# Twitter
-#
-#
-#
-#
 
 def fetch_author_info(tweet_document):
     tweet_url = "https://twitter135.p.rapidapi.com/v2/UserTweets/"
