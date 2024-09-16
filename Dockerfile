@@ -7,11 +7,14 @@ WORKDIR /code
 RUN apt-get update && apt-get install -y git && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
+# Upgrade pip to the desired version
+RUN pip install --upgrade pip==24.0
+
 # Install Python dependencies
-COPY requirements.txt .
+COPY requirements.txt . 
 RUN pip install --no-cache-dir --no-warn-script-location -r requirements.txt && \
     pip install --no-cache-dir protobuf==3.15.3
-    
+
 # Copy the rest of the application code into the container
 COPY . .
 
