@@ -536,7 +536,7 @@ class RedditScrapTestCase(TestCase):
         # Mock Reddit API responses
         mock_reddit_instance = Mock()
         mock_subreddit = Mock()
-        mock_subreddit.search.return_value = [Mock(title="Sample title", selftext="Sample selftext", permalink="/r/sample_post", author=Mock(name='author', name="test_user"), created_utc=1609459200, comments=Mock())]
+        mock_subreddit.search.return_value = [Mock(title="Sample title", selftext="Sample selftext", permalink="/r/sample_post", author=Mock(name="test_user"), created_utc=1609459200, comments=Mock())]
         mock_praw_reddit.return_value = mock_reddit_instance
         mock_reddit_instance.subreddit.return_value = mock_subreddit
         
