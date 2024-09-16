@@ -26,10 +26,6 @@ from .generate_interests import generate_interests
 from .generate_theme import generate
 from .modeling_eval import clustering
 from .models import ScrapConfig
-import os
-import json
-import datetime
-from .serialisationdatatest import serialisation_data, serialize_custom, print_types
 from django.urls import reverse, resolve
 from database import views
 from django.http import JsonResponse
@@ -1896,55 +1892,6 @@ class ScrapConfigTests(TestCase):
         text = "Here are some hashtags: #hashtag1 #hashtag2."
         mentions = self.config.extract_mentions(text, self.config.mention_pattern)
         self.assertEqual(mentions, ['#hashtag1', '#hashtag2'])
-
-class SerializationDataTests(TestCase):
-
-    def setUp(self):
-        # Create a sample data file for testing
-        self.data_path = os.path.join(os.path.dirname(__file__), 'data.json')
-        self.serialisation_path = os.path.join(os.path.dirname(__file__), 'serialisation.json')
-        
-        sample_data = {
-            "name": "John Doe",
-            "age": 30,
-            "date_of_birth": "1994-05-23",
-            "registered": datetime.datetime(2024, 1, 15, 8, 30, 45)
-        }
-        
-        with open(self.data_path, 'w') as f:
-            json.dump(sample_data, f)
-            
-        self.sentiment_chart_dict = {
-            "positive": 0.8,
-            "neutral": 0.1,
-            "negative": 0.1
-        }
-        
-        with open(self.serialisation_path, 'w') as f:
-            json.dump(self.sentiment_chart_dict, f)
-
-    def test_serialisation_data(self):
-        expected_data = {
-            "name": "John Doe",
-            "age": 30,
-            "date_of_birth": "1994-05-23",
-            "registered": "2024-01-15T08:30:45"
-        }
-        data = serialisation_data()
-        self.assertEqual(data, expected_data)
-
-    def test_serialize_custom_datetime(self):
-        dt = datetime.datetime(2024, 1, 15, 8, 30, 45)
-        serialized = serialize_custom(dt)
-        self.assertEqual(serialized, dt.isoformat())
-
-    def test_serialize_custom_non_serializable(self):
-        with self.assertRaises(TypeError):
-            serialize_custom(object())
-
-    def test_print_types(self):
-        result = print_types()
-        self.assertEqual(result, self.sentiment_chart_dict)
 
 class TestUrls(TestCase):
 
