@@ -8,28 +8,28 @@ from .api_instagram import fetch_instagram_data, instagram_scrap
 from .api_linkedin import fetch_linkedin_profile_posts, search_linkedin_posts, linkedin_scrap
 from .api_ranking import get_ranking
 from .api_reddit import reddit_scrap
-from api_tiktok import process_tiktok, tiktok_scrap
-from api_twitter import fetch_author_info, twitter_scrap
-from api_youtube import get_video_details_in_bulk, youtube_scrap
-from classification_hashtag import classificationHashtag
-from clustering_domain import clustering_domains
-from clustering_ranking import clusteringRanking
-from combinefiletest import combine_json_files
-from db import (
+from .api_tiktok import process_tiktok, tiktok_scrap
+from .api_twitter import fetch_author_info, twitter_scrap
+from .api_youtube import get_video_details_in_bulk, youtube_scrap
+from .classification_hashtag import classificationHashtag
+from .clustering_domain import clustering_domains
+from .clustering_ranking import clusteringRanking
+from .combinefiletest import combine_json_files
+from .db import (
     ElasticsearchConfig,
     find_insert_or_delete_market_charts,
     find_insert_or_delete_topics_charts,
     find_insert_or_delete_domain_charts,
     find_insert_or_delete_ranking_charts
 )
-from generate_interests import generate_interests
-from generate_theme import generate
-from modeling_eval import clustering
-from models import ScrapConfig
+from .generate_interests import generate_interests
+from .generate_theme import generate
+from .modeling_eval import clustering
+from .models import ScrapConfig
 import os
 import json
 import datetime
-from serialisationdatatest import serialisation_data, serialize_custom, print_types
+from .serialisationdatatest import serialisation_data, serialize_custom, print_types
 from django.urls import reverse, resolve
 from database import views
 from django.http import JsonResponse
