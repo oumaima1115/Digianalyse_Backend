@@ -2,7 +2,7 @@ import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import concurrent
 import re
-from .models import ScrapConfig
+from database.models import ScrapConfig
 import time
 import praw
 import requests

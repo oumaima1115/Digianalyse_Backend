@@ -5,24 +5,24 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from elasticsearch_dsl import Search, connections
-from .db import find_insert_or_delete_market_charts, find_insert_or_delete_topics_charts,find_insert_or_delete_domain_charts, find_insert_or_delete_ranking_charts, ElasticsearchConfig
-from .combinefiletest import combine_json_files
-from .modeling_eval import clustering
-from .generate_theme import generate
-from .generate_interests import generate_interests
-from .api_youtube import youtube_scrap
-from .api_instagram import instagram_scrap
-from .api_linkedin import linkedin_scrap
-from .api_reddit import reddit_scrap
-from .api_tiktok import tiktok_scrap
-from .api_twitter import twitter_scrap
-from .api_google import google_scrap
-from .api_best_hashtag import api_besthashtag
-from .api_domains import get_domains_metrics
-from .classification_hashtag import classificationHashtag
-from .clustering_domain import clustering_domains
-from .api_ranking import get_ranking
-from .clustering_ranking import clusteringRanking
+from database.db import find_insert_or_delete_market_charts, find_insert_or_delete_topics_charts,find_insert_or_delete_domain_charts, find_insert_or_delete_ranking_charts, ElasticsearchConfig
+from database.combinefiletest import combine_json_files
+from database.modeling_eval import clustering
+from database.generate_theme import generate
+from database.generate_interests import generate_interests
+from database.api_youtube import youtube_scrap
+from database.api_instagram import instagram_scrap
+from database.api_linkedin import linkedin_scrap
+from database.api_reddit import reddit_scrap
+from database.api_tiktok import tiktok_scrap
+from database.api_twitter import twitter_scrap
+from database.api_google import google_scrap
+from database.api_best_hashtag import api_besthashtag
+from database.api_domains import get_domains_metrics
+from database.classification_hashtag import classificationHashtag
+from database.clustering_domain import clustering_domains
+from database.api_ranking import get_ranking
+from database.clustering_ranking import clusteringRanking
 
 elasticsearch_instance = ElasticsearchConfig.get_instance()
 

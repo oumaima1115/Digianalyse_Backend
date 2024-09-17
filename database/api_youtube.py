@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from googleapiclient.discovery import build
 import uuid
-from .models import ScrapConfig
+from database.models import ScrapConfig
 
 #
 #
